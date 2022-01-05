@@ -3,42 +3,43 @@ const app = express()
 const path = require('path')
 const bodyParser = require("body-parser");
 
-let routesapi = require('./routes/routesapi.js')
-let routes = require('./routes/routes.js')
 
 app.use(bodyParser.json());
 let pessoas = require('./dados/pessoas.js').pessoas
 
-
-
-app.get("/post",(req,res,next)=>{
+app.get("/",(req,res,next)=>{
     res.sendFile(path.join(__dirname,"/pages/post.html"))
 })
 
+
+
 app.post("/pessoas",(req,res,next)=>{
-    let result = pessoas.slice();
     let have = false
-    console.log("_________________________________")
-    console.log(req.body)
+    let result = pessoas.slice();
+
     function checkName(obj) {
-        return obj.name == req.body.name;
+        const a = obj.name.toUpperCase()
+        return a.includes(req.body.name.toUpperCase());
     }
     function checkEmail(obj) {
-        return obj.email == req.body.email;
+        return obj.email.toUpperCase() == req.body.email.toUpperCase();
     }
     function checkId(obj) {
         return obj.id == req.body.id;
     }
-    if(req.body.name !== ""){
+    function validation(data){
+        if(data.length >= 3 && data != "") return true
+    }
+    
+    if(validation(req.body.name)){
        result =  result.filter(checkName)
        have = true
     }
-    if(req.body.email !== ""){
+    if(validation(req.body.email)){
         result =  result.filter(checkEmail)
         have = true 
     }
     if(req.body.id !== ""){
-        console.log(req.body.id)
         result =  result.filter(checkId)
         have = true
     }
@@ -50,10 +51,6 @@ app.post("/pessoas",(req,res,next)=>{
 })
 
 
-app.use('/middleware',routes)
-app.use('/post',routes)
-app.use('/pessoas',routes)
-app.use('/api',routesapi)
-app.use('/',routes)
+
 const port = process.env.PORT || 3004
 app.listen(port,()=>console.log(`Ouvindo na porta ${port} ...`))
