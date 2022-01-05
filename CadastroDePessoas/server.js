@@ -11,43 +11,29 @@ app.get("/",(req,res,next)=>{
     res.sendFile(path.join(__dirname,"/pages/post.html"))
 })
 
+app.get("/pessoas/id/:id",(req,res,next)=>{
+   const result = pessoas.filter((obj) =>{
+      return obj.id == req.params.id  
+   })
+   res.send(result)
+})
 
-
-app.post("/pessoas",(req,res,next)=>{
-    let have = false
-    let result = pessoas.slice();
-
-    function checkName(obj) {
+app.get("/pessoas/name/:name",(req,res,next)=>{
+    const result = pessoas.filter((obj) =>{
         const a = obj.name.toUpperCase()
-        return a.includes(req.body.name.toUpperCase());
-    }
-    function checkEmail(obj) {
-        return obj.email.toUpperCase() == req.body.email.toUpperCase();
-    }
-    function checkId(obj) {
-        return obj.id == req.body.id;
-    }
-    function validation(data){
-        if(data.length >= 3 && data != "") return true
-    }
-    
-    if(validation(req.body.name)){
-       result =  result.filter(checkName)
-       have = true
-    }
-    if(validation(req.body.email)){
-        result =  result.filter(checkEmail)
-        have = true 
-    }
-    if(req.body.id !== ""){
-        result =  result.filter(checkId)
-        have = true
-    }
-    if(result.length === 0 || !have){
-        res.send(false)
-    }else{
-        res.send(result)
-    }
+        return a.includes(req.params.name.toUpperCase());
+    })
+    res.send(result)
+ })
+app.get("/pessoas/email/:email",(req,res,next)=>{
+    const result = pessoas.filter((obj) =>{
+        const a = obj.email.toUpperCase()
+        return a == req.params.email.toUpperCase();
+    })
+    res.send(result)
+ })
+app.post("/pessoas",(req,res,next)=>{
+    res.send(pessoas)
 })
 
 

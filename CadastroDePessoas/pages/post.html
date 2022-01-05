@@ -9,15 +9,17 @@
 <body>
     <h1>Formulario Fetch</h1>
     <section class='formulario'>
-        <label for="id">ID</label>
-        <input type="number" id='id'>
+    
+        <label for="type">Forma de consulta</label>
+        <select name="options" id="type_data">
+            <option value="id">ID</option>
+            <option value="name">Name</option>
+            <option value="email">Email</option>
+        </select>
 
-        <label for="name">NAME</label>
-        <input type="text" id='name'>
-
-        <label for="email">EMAIL</label>
-        <input type="text" id='email'>
-
+        <label for="form_input"></label>
+        <input type="text" id='form_input'>
+        <div id="suggestions_input"></div>
         <button id='confirmar'>Confirmar</button>
     </section>
     <section class='result'>
@@ -62,40 +64,63 @@
     console.log("Usando o Fetch")
     
     const CONFIRMAR = document.querySelector('#confirmar')
-    CONFIRMAR.addEventListener('click',mandar)
+    CONFIRMAR.addEventListener('click',send)
+    const inputForm = document.querySelector("#form_input")
+    inputForm.addEventListener("keyup", showSuggestions);
     
-    function mandar(){
-        let id = document.querySelector("#id").value
-        let email = document.querySelector("#email").value
-        let name = document.querySelector("#name").value
-        let objectPerson = {
-            "name":name,
-            "id":id,
-            "email":email
+    let IsTimeout = false
+    const  intervalRequest = window.setInterval(()=>IsTimeout = false, 2000);
+    function showSuggestions(){
+        const inputForm = document.querySelector("#form_input")
+        if(IsTimeout) return 
+        if(typeData() == 'id'){
+            IsTimeout = true
+            send()
         }
-        const requestOptions = {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(objectPerson)
+        else if(inputForm.value.length >=3){
+            IsTimeout = true
+            send()
         }
-        fetch(`http://localhost:3004/pessoas`,requestOptions)
+    }
+    function typeData(){
+        const selectElement = document.querySelector('#type_data')        
+        const typeData = selectElement.options[selectElement.selectedIndex].value;
+        return typeData
+    }
+    function catData(){
+        const inputElement = document.querySelector('#form_input')
+        const valueInput = inputElement.value
+        return valueInput
+    }
+    function request(url,requestOptions){
+        fetch(url,requestOptions)
             .then(function(response){
                 if(!response.ok) throw new Error("Erro ao executar requisição")
                 return response.json()
             })
             .then(function(data){
-                if(data == false){
-                    alert('Não a informações valida')
-                }else{
-                    document.querySelector('.result').innerHTML = ""
-                    for(let i=0;i<data.length;i++){
-                        addObj(data[i])
-                    }
+                document.querySelector('.result').innerHTML = ""
+                for(let i=0;i<data.length;i++){
+                    addObj(data[i])
                 }
             })
             .catch(function(error){
                 console.error(error.message)
             })
+    }
+    function defineUrl(url){
+        const TYPE = typeData()
+        const VALUE = catData() 
+        const URL = url.concat(TYPE,"/",VALUE)
+        return URL        
+    }
+    function send(){
+        const requestOptions = {
+            method: "GET",
+            headers: { 'Content-Type': 'application/json' },
+        }
+        const url = defineUrl('http://localhost:3004/pessoas/')
+        request(url,requestOptions)
     }
 
     function addObj(obj){
