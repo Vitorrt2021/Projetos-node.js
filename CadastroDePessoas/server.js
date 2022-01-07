@@ -41,12 +41,13 @@ app.get("/pessoas",(req,res,next)=>{
     res.send(pessoas)
 })
 app.post('/pessoas',(req,res)=>{
+    console.log(req.body)
     const pessoa = {
         "id": pessoas.length + 1,
         "name": req.body.name,
         "email":req.body.email
     }
-    if(req.body.email >=3 && req.body.name>=3){
+    if(req.body.email.length >=3 && req.body.name.length>=3){
         pessoas.push(pessoa)
         res.send(pessoa);
     }else{
