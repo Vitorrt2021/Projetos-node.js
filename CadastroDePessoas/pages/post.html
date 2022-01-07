@@ -10,9 +10,7 @@
 </head>
 <body>
     <h1>Formulario Fetch</h1>
-    <form class='formulario'>
-    
-        <label for="type">Forma de consulta</label>
+    <form class='form_get'>
         <select name="options" id="type_data">
             <option value="id">ID</option>
             <option value="name">Name</option>
@@ -21,20 +19,67 @@
 
         <input type="text" id='form_input'>
    
-        <button id='confirmar'>Confirmar</button>
-   
+        <button id='button_get'>Confirmar</button>
+        <button id='button_form_get_post'>Adicionar</button>
+
+    </form>
+    
+    <form class='form_post'>
+        
+        <label for="form_input_name_post">Adicionar pessoa com o nome</label>
+        <input type="text" id='form_input_name_post'>
+        
+        <label for="form_input_email_post">Email</label>
+        <input type="text" id='form_input_email_post'>
+        
+        <button id='button_post'>Adicionar</button>
+        
+        <button id='button_post_cancel'>Cancelar</button>
+    </form>
+    
+    <form class='form_delete'>
         <label for="form_input_delete">Deletar a pessoa com o ID</label>
         <input type="text" id='form_input_delete'>
         <button id='button_delete'>Deletar</button>
 
-        <label for="form_input_put_">Deletar a pessoa com o ID</label>
-        <input type="text" id='form_input_delete'>
-        <button id='button_delete'>Deletar</button>
-
+        <button id='button_delete_cancel'>Cancelar</button>
     </form>
-    <section class='result'>
 
-    </section>
+    <form class='form_put'>
+        <label for="form_input_name_put">Mudar o da pessoa para</label>
+        <input type="text" id='form_input_name_put'>
+        
+        <label for="form_input_email_put">Email</label>
+        <input type="text" id='form_input_email_put'>
+
+        <label for="form_input_id_put">O ID da pessoa</label>
+        <input type="text" id='form_input_id_put'>
+        <button id='button_put'>Mudar</button>
+
+        <button id='button_put_cancel'>Cancelar</button>
+    </form>
+
+    <table id='result'>
+        <tr>
+            <th>ID</th>
+            <th>NOME</th>
+            <th>EMAIL</th>
+        </tr>
+        <tr>
+            <th>ID</th>
+            <th>NOME</th>
+            <th>EMAIL</th>
+        </tr>
+        <tr>
+            <th>ID</th>
+            <th>NOME</th>
+            <th>EMAIL</th>
+            <th>BUT</th>
+            
+        </tr>
+ 
+ 
+    </table>
     <script type="text/javascript" src="./script.js"></script>
 
 </body>

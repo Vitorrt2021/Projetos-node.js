@@ -1,13 +1,45 @@
-const CONFIRMAR = document.querySelector('#confirmar')
-CONFIRMAR.addEventListener('click',sendGet)
-
-const DELETE = document.querySelector('#button_delete')
-DELETE.addEventListener('click',sendDelete)
 
 const inputForm = document.querySelector("#form_input")
-inputForm.addEventListener("keyup", showSuggestions);
+inputForm.addEventListener("input", showSuggestions);
 
-document.querySelector('form').addEventListener('click',stopDefAction)
+const button_get = document.querySelector('#button_get')
+button_get.addEventListener('click',sendGet)
+button_get.addEventListener('click',stopDefAction)
+
+const button_formGet_put = document.querySelector('#button_form_get_post')
+button_formGet_put.addEventListener('click',()=>showElement('.form_put'))
+button_formGet_put.addEventListener('click',stopDefAction)
+
+createFormButton('post',sendPost)
+createFormButton('delete',sendDelete)
+createFormButton('put',sendPut)
+cancelScreen()
+function createFormButton(nameElement,func){
+    const element = document.querySelector('#button_'+nameElement)
+    element.addEventListener('click',func)
+    element.addEventListener('click',stopDefAction)
+    element.addEventListener('click',()=>{hideElement('.form_'+nameElement)})
+}
+
+function createFormButtonCancel(nameElement){
+    const element = document.querySelector('#button_'+nameElement+'_cancel')
+    element.addEventListener('click',stopDefAction)
+    element.addEventListener('click',()=>{hideElement('.form_'+nameElement)})
+}
+function cancelScreen(){
+    createFormButtonCancel('put')
+    createFormButtonCancel('post')
+    createFormButtonCancel('delete')
+}
+function showElement(nameElement){
+    const element = document.querySelector(nameElement)
+    element.style.display = 'flex'
+}
+function hideElement(nameElement){
+    const element = document.querySelector(nameElement)
+    element.style.display = 'none'
+}
+
 function stopDefAction(evt) {
     evt.preventDefault();
 }
@@ -30,14 +62,9 @@ function stopDefAction(evt) {
         const typeData = selectElement.options[selectElement.selectedIndex].value;
         return typeData
     }
-    function catData(){
-        const inputElement = document.querySelector('#form_input')
-        const valueInput = inputElement.value
-        return valueInput
-    }
-    function catIpDelete(){
-        const IP = document.querySelector('#form_input_delete')
-        return IP.value
+    function getValue(elementSelector){
+        const val = document.querySelector(elementSelector)
+        return val.value
     }
     function request(url,requestOptions,callback){
         fetch(url,requestOptions)
@@ -53,18 +80,26 @@ function stopDefAction(evt) {
                 }
             })
             .catch(function(error){
-                console.error(error.message)
+                alert(error.message)
             })
     }
     function createTableFunction(data){
-        document.querySelector('.result').innerHTML = ""
+        document.querySelector('#result').innerHTML = ''
+        if(data.length < 1) return
+        document.querySelector('#result').innerHTML = `
+        <tr>
+            <th>ID</th>
+            <th>NOME</th>
+            <th>EMAIL</th>
+        </tr>
+        `
         for(let i=0;i<data.length;i++){
-            addObj(data[i])
+            createLine(data[i])
         }
     }
     function defineUrlGet(url){
         const TYPE = typeData()
-        const VALUE = catData() 
+        const VALUE = getValue('#form_input') 
         const URL = url.concat("?type=",TYPE,"&",TYPE,"=",VALUE)
         console.log("URL é ",URL)
         return URL        
@@ -78,11 +113,28 @@ function stopDefAction(evt) {
         const url = defineUrlGet('http://localhost:3004/pessoas/')
         request(url,requestOptions,createTableFunction)
     }
-    function sendPut(){
-        const id = catIpPut()
-        
+    function sendPost(){
+        const name = getValue('#form_input_name_post')
+        const email = getValue('#form_input_email_post')
         const newPersonData = {
-            "id":id
+            "name" :name,
+            "email": email,
+        };
+        const requestOptions={
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newPersonData)
+        }
+        const url = 'http://localhost:3004/pessoas/'
+        request(url,requestOptions,createTableFunction)   
+    }
+    function sendPut(){
+        const id = getValue('#form_input_id_put')
+        const name = getValue('#form_input_name_put')
+        const email = getValue('#form_input_email_put')
+        const newPersonData = {
+            "name" :name,
+            "email": email,
         };
         const requestOptions={
             method: "PUT",
@@ -93,7 +145,7 @@ function stopDefAction(evt) {
         request(url,requestOptions,createTableFunction)   
     }
     function sendDelete(){
-        const id = catIpDelete()
+        const id = getValue('#form_input_delete')
         const requestOptions={
             method: "DELETE",
             headers: { 'Content-Type': 'application/json' },
@@ -101,30 +153,28 @@ function stopDefAction(evt) {
         const url = 'http://localhost:3004/pessoas/'.concat(id)
         request(url,requestOptions,createTableFunction)   
     }
-    function addObj(obj){
-        const elementName = document.createElement('ul');
-        elementName.setAttribute('class','person_name')
-        elementName.innerHTML = obj.name
-        
-        const elementId = document.createElement('ul');
-        elementId.setAttribute('class','person_id')
-        elementId.innerHTML = obj.id
-        
-        const elementEmail = document.createElement('ul');
-        elementEmail.setAttribute('class','person_email')
-        elementEmail.innerHTML = obj.email
-        
-        createTable(createPerson(elementName,elementId,elementEmail));
+    function createLine(obj){
+        const line = document.createElement('tr')
+        line.append(createColumn(obj.id,"id"))
+        line.append(createColumn(obj.name,"name"))
+        line.append(createColumn(obj.email,"email"))
+        line.append(createButtonColumn(showElement,'delete'))
+        line.append(createButtonColumn(showElement,'put'))
+        const table = document.querySelector('#result')
+        table.append(line)
     }
-    function createPerson(name,id,email){
-        const PERSON = document.createElement('li')
-        PERSON.setAttribute('class','person');
-        PERSON.append(name);
-        PERSON.append(id);
-        PERSON.append(email);
-        return PERSON
+    function createButtonColumn(func,type){
+        const column = document.createElement('td')
+        const button = document.createElement('button')
+        button.setAttribute('class','table_'+type)
+        button.addEventListener('click',()=>{func('.form_'+type)})
+        button.innerHTML = type
+        column.append(button)
+        return column
     }
-    function createTable(Person){
-        const RESULT = document.querySelector('.result')
-        RESULT.append(Person);
+    function createColumn(value,type){
+        const column = document.createElement('td')
+        column.setAttribute("class", "table_"+type);
+        column.innerHTML = value
+        return column
     }

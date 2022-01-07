@@ -46,16 +46,22 @@ app.post('/pessoas',(req,res)=>{
         "name": req.body.name,
         "email":req.body.email
     }
-   pessoas.push(pessoa)
-   res.send(pessoa); 
+    if(req.body.email >=3 && req.body.name>=3){
+        pessoas.push(pessoa)
+        res.send(pessoa);
+    }else{
+        res.status(400).send("O nome é o email devem ter ao menor 3 caracteres!")
+    }
+    
 })
 app.put('/pessoas/:id',(req,res) => {
+   
     const pessoa = pessoas.find(c => c.id ===parseInt(req.params.id))
     if(!pessoa){
         return res.status(404).send("Não tem pessoa com esse ID")
     }
-    pessoa.name = req.body.name;
-    pessoa.email = req.body.email;
+    if(req.body.name.length >=3) pessoa.name = req.body.name
+    if(req.body.email.length >=3) pessoa.email = req.body.email;
     res.send(pessoa)
 })
 
