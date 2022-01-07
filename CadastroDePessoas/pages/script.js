@@ -44,22 +44,26 @@ function stopDefAction(evt) {
     evt.preventDefault();
 }
     let IsTimeout = false
-    const  intervalRequest = window.setInterval(()=>{
+    function setIntervarRequest(){
+    const  intervalRequest = setTimeout(()=>{
         IsTimeout = false
         if(getValue('#form_input').length >=3|| typeData()=="id"){
             sendGet()
         }
         }, 2000);
+    }
     function showSuggestions(){
         const inputForm = document.querySelector("#form_input")
         if(IsTimeout) return 
         if(typeData() == 'id'){
             IsTimeout = true
             sendGet()
+            setIntervarRequest()
         }
         else if(inputForm.value.length >=3){
             IsTimeout = true
             sendGet()
+            setIntervarRequest()
         }
     }
     function typeData(){
@@ -115,7 +119,7 @@ function stopDefAction(evt) {
             method: "GET",
             headers: { 'Content-Type': 'application/json' },
         }
-        const url = defineUrlGet('http://localhost:3004/pessoas/')
+        const url = defineUrlGet('/pessoas/')
         if(getValue('#form_input').length >=3|| typeData()=="id"){
             request(url,requestOptions,createTableFunction)
         }else{
@@ -134,8 +138,13 @@ function stopDefAction(evt) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newPersonData)
         }
-        const url = 'http://localhost:3004/pessoas/'
-        request(url,requestOptions,createTableFunction)   
+        if(name.length >=3 && email.length >=3){
+            const url = '/pessoas/'
+            request(url,requestOptions,createTableFunction)
+        }else{
+            alert('Insira mais de três caracteres')
+        }
+           
     }
     function sendPut(id){
         return function(){
@@ -150,7 +159,7 @@ function stopDefAction(evt) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newPersonData)
             }
-            const url = 'http://localhost:3004/pessoas/'.concat(id)
+            const url = '/pessoas/'.concat(id)
             request(url,requestOptions,createTableFunction)   
         }
     }
@@ -161,7 +170,7 @@ function stopDefAction(evt) {
             method: "DELETE",
             headers: { 'Content-Type': 'application/json' },
         }
-        const url = 'http://localhost:3004/pessoas/'.concat(id)
+        const url = '/pessoas/'.concat(id)
         request(url,requestOptions,createTableFunction)   
     }
     function createLine(obj){
@@ -189,8 +198,8 @@ function stopDefAction(evt) {
         const button = document.createElement('button')
         button.setAttribute('class','table_put')
         button.addEventListener('click',()=>{func('put')})
-        const putWithId = sendPut(id)
-        createFormButton('put',putWithId)
+        let putWithId = sendPut(id)
+        button.addEventListener('click',()=>{createFormButton('put',putWithId)})
         button.innerHTML = 'Mudar'
         column.append(button)
         return column

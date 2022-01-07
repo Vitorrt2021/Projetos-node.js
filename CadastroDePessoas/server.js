@@ -6,10 +6,10 @@ const bodyParser = require("body-parser");
 app.use(express.static('pages'));
 
 app.use(bodyParser.json());
-let pessoas = require('./dados/pessoas.js').pessoas
+let pessoas = require('./data/pessoas.js').pessoas
 
 app.get("/",(req,res,next)=>{
-    res.sendFile(path.join(__dirname,"/pages/post.html"))
+    res.sendFile(path.join(__dirname,"/pages/index.html"))
 })
 
 app.get("/pessoas",(req,res,next)=>{
@@ -41,7 +41,7 @@ app.get("/pessoas",(req,res,next)=>{
     res.send(pessoas)
 })
 app.post('/pessoas',(req,res)=>{
-    console.log(req.body)
+
     const pessoa = {
         "id": pessoas.length + 1,
         "name": req.body.name,
@@ -56,7 +56,6 @@ app.post('/pessoas',(req,res)=>{
     
 })
 app.put('/pessoas/:id',(req,res) => {
-   
     const pessoa = pessoas.find(c => c.id ===parseInt(req.params.id))
     if(!pessoa){
         return res.status(404).send("Não tem pessoa com esse ID")
